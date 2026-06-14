@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Builder - Niron</title>
+    <style>
+        :root {
+            --niron-bg: #F4EDC5;
+            --niron-primary: #9E7957;
+            --niron-primary-dark: #896746;
+            --niron-card: #fffaf0;
+            --niron-border: #e2d2ad;
+            --niron-text-soft: #7f684f;
+            --niron-shadow: 0 18px 40px rgba(158, 121, 87, 0.12);
+            --niron-danger-bg: #fff5f5;
+            --niron-danger-border: #edc7c7;
+            --niron-danger-text: #9a4f4f;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #f7f0cd 0%, #f4edc5 100%);
+            color: var(--niron-primary);
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background: rgba(244, 237, 197, 0.94);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(158, 121, 87, 0.15);
+        }
+
+        .topbar-inner {
+            width: min(1600px, calc(100% - 28px));
+            margin: 0 auto;
+            padding: 16px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand {
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .subline {
+            color: var(--niron-text-soft);
+            font-size: 15px;
+            margin-top: 6px;
+        }
+
+        .back {
+            text-decoration: none;
+            color: var(--niron-primary);
+            background: #fff;
+            border: 1px solid var(--niron-border);
+            padding: 12px 18px;
+            border-radius: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .page {
+            width: min(1600px, calc(100% - 28px));
+            margin: 22px auto 40px;
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr) 230px;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel,
+        .workspace-card {
+            background: rgba(255, 250, 240, 0.94);
+            border: 1px solid var(--niron-border);
+            border-radius: 24px;
+            box-shadow: var(--niron-shadow);
+            padding: 20px;
+        }
+
+        .panel h2,
+        .panel h3,
+        .workspace-card h2 {
+            margin: 0 0 14px;
+        }
+
+        .stack {
+            display: grid;
+            gap: 18px;
+        }
+
+        .sheet-meta {
+            display: grid;
+            gap: 12px;
+        }
+
+        .meta-box {
+            background: #fffdf7;
+            border: 1px solid var(--niron-border);
+            border-radius: 16px;
+            padding: 14px;
+        }
+
+        .meta-box small {
+            display: block;
+            color: var(--niron-text-soft);
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .meta-box strong {
+            font-size: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        input[type="file"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--niron-border);
+            border-radius: 14px;
+            background: #fffdf7;
+            margin-bottom: 14px;
+            font-size: 14px;
+            color: var(--niron-primary);
+        }
+
+        .btn,
+        .btn-light {
+            width: 100%;
+            border-radius: 14px;
+            padding: 13px 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.18s ease;
+        }
+
+        .btn {
+            border: none;
+            background: var(--niron-primary);
+            color: #fff;
+        }
+
+        .btn:hover {
+            background: var(--niron-primary-dark);
+        }
+
+        .btn-light {
+            border: 1px solid var(--niron-border);
+            background: #fff;
+            color: var(--niron-primary);
+        }
+
+        .btn-light:hover {
+            background: #fff8ed;
+        }
+
+        .muted {
+            color: var(--niron-text-soft);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .items-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .item-card {
+            background: #fffdf7;
+            border: 1px solid var(--niron-border);
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid rgba(158, 121, 87, 0.10);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .checks {
+            display: grid;
+            gap: 8px;
+            margin: 10px 0 14px;
+            color: var(--niron-text-soft);
+            font-size: 14px;
+        }
+
+        .checks label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 400;
+            margin: 0;
+        }
+
+        .item-actions {
+            display: grid;
+            gap: 10px;
+        }
+
+        .workspace-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .workspace-head p {
+            margin: 6px 0 0;
+            color: var(--niron-text-soft);
+        }
+
+        .zoom-tools {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .zoom-pill {
+            min-width: 68px;
+            text-align: center;
+            background: #fff;
+            border: 1px solid var(--niron-border);
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .mini-btn {
+            border: 1px solid var(--niron-border);
+            background: #fff;
+            color: var(--niron-primary);
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .sheet-stage-wrap {
+            overflow: auto;
+            padding: 14px;
+            border-radius: 18px;
+            background: #efe7bf;
+            border: 1px solid var(--niron-border);
+            min-height: 720px;
+        }
+
+        .sheet-outer {
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .ruler-top,
+        .ruler-left {
+            position: absolute;
+            background: #fffaf0;
+            border: 1px solid #d8c39f;
+            overflow: hidden;
+        }
+
+        .ruler-top {
+            top: 0;
+            left: 34px;
+            height: 34px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .ruler-left {
+            top: 34px;
+            left: 0;
+            width: 34px;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .ruler-mark-v,
+        .ruler-mark-h {
+            position: absolute;
+            background: rgba(158,121,87,0.22);
+        }
+
+        .ruler-mark-v {
+            top: 0;
+            width: 1px;
+            height: 100%;
+        }
+
+        .ruler-mark-h {
+            left: 0;
+            width: 100%;
+            height: 1px;
+        }
+
+        .ruler-label-top,
+        .ruler-label-left {
+            position: absolute;
+            font-size: 10px;
+            color: var(--niron-text-soft);
+            white-space: nowrap;
+        }
+
+        .ruler-label-top {
+            top: 11px;
+            left: 4px;
+        }
+
+        .ruler-label-left {
+            top: 2px;
+            left: 6px;
+        }
+
+        .sheet-stage {
+            position: absolute;
+            top: 34px;
+            left: 34px;
+            background:
+                linear-gradient(to right, rgba(158,121,87,0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(158,121,87,0.06) 1px, transparent 1px),
+                #fff;
+            border: 2px solid #c9ae8b;
+            border-radius: 18px;
+            box-shadow: inset 0 0 0 8px rgba(244,237,197,0.45);
+        }
+
+        .sheet-safe-zone {
+            position: absolute;
+            border: 2px dashed rgba(158,121,87,0.35);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--niron-text-soft);
+            text-align: center;
+            padding: 18px;
+            font-size: 16px;
+        }
+
+        .preview-item {
+            position: absolute;
+            border: 1px dashed rgba(158,121,87,0.35);
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .overflow-list {
+            margin-top: 18px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .overflow-item {
+            background: var(--niron-danger-bg);
+            border: 1px solid var(--niron-danger-border);
+            color: var(--niron-danger-text);
+            border-radius: 12px;
+            padding: 11px 12px;
+            font-size: 14px;
+        }
+
+        .empty {
+            background: #fffdf7;
+            border: 1px dashed var(--niron-border);
+            border-radius: 18px;
+            padding: 30px;
+            text-align: center;
+            color: var(--niron-text-soft);
+        }
+
+        @media (max-width: 1280px) {
+            .page {
+                grid-template-columns: 1fr;
+            }
+
+            .sheet-stage-wrap {
+                min-height: 520px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-inner">
+            <div>
+                <div class="brand">Niron Builder</div>
+                <div class="subline">
+                    {{ sheet.name|default:"Untitled Sheet" }} · {{ sheet.width_cm|default:0 }} cm × {{ sheet.height_cm|default:0 }} cm
+                </div>
+            </div>
+            <a href="{% url 'home' %}" class="back">Back Home</a>
+        </div>
+    </div>
+
+    <div
+        id="root"
+        data-sheet-id="{{ sheet.id }}"
+        data-sheet-name="{{ sheet.name|default:'Untitled Sheet' }}"
+        data-sheet-width="{{ sheet.width_cm|default:0 }}"
+        data-sheet-height="{{ sheet.height_cm|default:0 }}"
+        data-sheet-spacing="{{ sheet.spacing_cm|default:0 }}"
+        data-sheet-margin="{{ sheet.margin_cm|default:0 }}"
+        data-upload-url="{{ request.path }}"
+        data-home-url="{% url 'home' %}"
+        data-csrf="{{ csrf_token }}"
+        hidden
+    ></div>
+
+    <script id="builder-items" type="application/json">
+    [
+      {% for item in items %}
+        {
+          "id": {{ item.id }},
+          "imageUrl": "{{ item.asset.original_file.url|escapejs }}",
+          "widthCm": {{ item.width_cm|default:1 }},
+          "heightCm": {{ item.height_cm|default:1 }},
+          "xCm": {{ item.x_cm|default:0 }},
+          "yCm": {{ item.y_cm|default:0 }}
+        }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ]
+    </script>
+
+    <div class="page">
+        <div class="stack">
+            <div class="panel">
+                <h2>Sheet Info</h2>
+
+                <div class="sheet-meta">
+                    <div class="meta-box">
+                        <small>Width</small>
+                        <strong>{{ sheet.width_cm|default:0 }} cm</strong>
+                    </div>
+                    <div class="meta-box">
+                        <small>Height</small>
+                        <strong>{{ sheet.height_cm|default:0 }} cm</strong>
+                    </div>
+                    <div class="meta-box">
+                        <small>Spacing</small>
+                        <strong>{{ sheet.spacing_cm|default:0 }} cm</strong>
+                    </div>
+                    <div class="meta-box">
+                        <small>Margin</small>
+                        <strong>{{ sheet.margin_cm|default:0 }} cm</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Upload Design</h3>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="upload_asset">
+
+                    <label for="original_file">Select image</label>
+                    <input id="original_file" type="file" name="original_file" accept="image/*" required>
+
+                    <button type="submit" class="btn">Upload to This Sheet</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <h3>Design Controls</h3>
+
+                {% if items %}
+                    <div class="items-list">
+                        {% for item in items %}
+                            <div class="item-card">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="update_item">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+
+                                    <img src="{{ item.asset.original_file.url }}" alt="item">
+
+                                    <div class="row-2">
+                                        <div>
+                                            <label>Width (cm)</label>
+                                            <input type="number" step="0.01" name="width_cm" value="{{ item.width_cm }}" required>
+                                        </div>
+                                        <div>
+                                            <label>Height (cm)</label>
+                                            <input type="number" step="0.01" name="height_cm" value="{{ item.height_cm }}" required>
+                                        </div>
+                                    </div>
+
+                                    <label>Quantity</label>
+                                    <input type="number" min="1" name="quantity" value="{{ item.quantity }}" required>
+
+                                    <div class="checks">
+                                        <label><input type="checkbox" name="lock_ratio" {% if item.lock_ratio %}checked{% endif %}> Lock ratio</label>
+                                        <label><input type="checkbox" name="use_processed" {% if item.use_processed %}checked{% endif %}> Use removed background image</label>
+                                        <label><input type="checkbox" name="use_upscaled" {% if item.use_upscaled %}checked{% endif %}> Use upscaled image</label>
+                                    </div>
+
+                                    <div class="item-actions">
+                                        <button type="submit" class="btn">Update</button>
+                                    </div>
+                                </form>
+
+                                <form method="post" style="margin-top:10px;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="delete_item">
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit" class="btn-light">Delete</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty">
+                        No design uploaded yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="workspace-card">
+            <div class="workspace-head">
+                <div>
+                    <h2>Sheet Preview</h2>
+                    <p>Preview how your quantity fills the sheet. Drag and resize can be added next in React.</p>
+                </div>
+
+                <div class="zoom-tools">
+                    <div class="zoom-pill">100%</div>
+                    <button type="button" class="mini-btn">−</button>
+                    <button type="button" class="mini-btn">+</button>
+                </div>
+            </div>
+
+            <div class="sheet-stage-wrap">
+                {% with ruler_size=34 %}
+                <div
+                    class="sheet-outer"
+                    style="width: {{ sheet_preview_width|default:420|add:ruler_size }}px; height: {{ sheet_preview_height|default:420|add:ruler_size }}px;"
+                >
+                    <div class="ruler-top" style="width: {{ sheet_preview_width|default:420 }}px;">
+                        {% for i in x_marks %}
+                            <div class="ruler-mark-v" style="left: {{ i.left }}px;">
+                                <div class="ruler-label-top">{{ i.label }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="ruler-left" style="height: {{ sheet_preview_height|default:420 }}px;">
+                        {% for i in y_marks %}
+                            <div class="ruler-mark-h" style="top: {{ i.top }}px;">
+                                <div class="ruler-label-left">{{ i.label }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div
+                        class="sheet-stage"
+                        style="width: {{ sheet_preview_width|default:420 }}px; height: {{ sheet_preview_height|default:420 }}px; background-size: {{ preview_scale|default:12 }}px {{ preview_scale|default:12 }}px;"
+                    >
+                        <div
+                            class="sheet-safe-zone"
+                            style="
+                                top: {{ safe_zone_top|default:20 }}px;
+                                left: {{ safe_zone_left|default:20 }}px;
+                                right: {{ safe_zone_right|default:20 }}px;
+                                bottom: {{ safe_zone_bottom|default:20 }}px;
+                            "
+                        >
+                            {% if not preview_items %}
+                                Your design items will appear here
+                            {% endif %}
+                        </div>
+
+                        {% for item in preview_items %}
+                            {% if not item.overflow %}
+                                <div
+                                    class="preview-item"
+                                    style="left: {{ item.left }}px; top: {{ item.top }}px; width: {{ item.width }}px; height: {{ item.height }}px;"
+                                >
+                                    <img src="{{ item.image_url }}" alt="preview">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endwith %}
+            </div>
+
+            <div class="overflow-list">
+                {% for item in preview_items %}
+                    {% if item.overflow %}
+                        <div class="overflow-item">
+                            Some items do not fit the current sheet size.
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Tools</h2>
+
+            <div class="stack" style="gap: 12px;">
+                <button type="button" class="btn">Auto Layout</button>
+                <button type="button" class="btn-light">Zoom In</button>
+                <button type="button" class="btn-light">Zoom Out</button>
+                <button type="button" class="btn-light">Save Layout</button>
+            </div>
+
+            <div class="meta-box" style="margin-top:16px;">
+                <small>Status</small>
+                <strong>{% if items %}{{ items|length }} item{{ items|length|pluralize }} loaded{% else %}No items yet{% endif %}</strong>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

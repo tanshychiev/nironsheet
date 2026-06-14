@@ -1,0 +1,898 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niron Print Workspace</title>
+    <style>
+        :root {
+            --bg: #171717;
+            --panel: #232323;
+            --panel-soft: #2b2b2b;
+            --line: #3b3b3b;
+            --line-warm: #715538;
+            --accent: #c6975f;
+            --accent-strong: #e1b67d;
+            --text: #f5f1eb;
+            --muted: #aaa49b;
+            --success: #54b878;
+            --danger: #d86d62;
+            --shadow: 0 20px 55px rgba(0, 0, 0, .32);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { min-height: 100%; }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 20% 0%, rgba(198, 151, 95, .12), transparent 34%),
+                linear-gradient(180deg, #191919 0%, #111 100%);
+        }
+
+        button, input, a { font: inherit; }
+
+        .app-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: 58px 1fr;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 0 26px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(30, 30, 30, .96);
+            backdrop-filter: blur(14px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 800;
+            letter-spacing: -.02em;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #a77a4c;
+            border-radius: 9px;
+            color: #20170f;
+            background: linear-gradient(145deg, #efd0a2, #b77f45);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+            font-size: 13px;
+            font-weight: 950;
+        }
+
+        .topbar-meta {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .page {
+            width: min(1320px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 48px 0 64px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(340px, .9fr);
+            gap: 30px;
+            align-items: stretch;
+            margin-bottom: 30px;
+        }
+
+        .hero-card,
+        .activity-card,
+        .sheets-panel {
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(43,43,43,.96), rgba(31,31,31,.98));
+            box-shadow: var(--shadow);
+        }
+
+        .hero-card {
+            position: relative;
+            overflow: hidden;
+            min-height: 280px;
+            padding: 42px;
+        }
+
+        .hero-card::after {
+            content: "";
+            position: absolute;
+            width: 310px;
+            height: 310px;
+            right: -115px;
+            top: -130px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(225,182,125,.24), transparent 65%);
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border: 1px solid rgba(198,151,95,.38);
+            border-radius: 999px;
+            color: var(--accent-strong);
+            background: rgba(198,151,95,.08);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        h1 {
+            max-width: 680px;
+            margin: 20px 0 12px;
+            font-size: clamp(38px, 5vw, 66px);
+            line-height: .98;
+            letter-spacing: -.045em;
+        }
+
+        .hero-copy {
+            max-width: 620px;
+            margin: 0;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.65;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 18px;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 800;
+            transition: transform .16s ease, border-color .16s ease, background .16s ease;
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+
+        .btn-primary {
+            color: #1d150d;
+            background: linear-gradient(180deg, #e6bd87, #bc854d);
+            border-color: #efc995;
+        }
+
+        .btn-secondary {
+            color: var(--text);
+            border-color: var(--line);
+            background: #252525;
+        }
+
+        .activity-card {
+            display: grid;
+            align-content: center;
+            gap: 14px;
+            padding: 28px;
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #202020;
+        }
+
+        .metric span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .metric strong {
+            font-size: 26px;
+            letter-spacing: -.03em;
+        }
+
+        .metric .green { color: var(--success); }
+
+        .sheets-panel {
+            padding: 22px;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .panel-title h2 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: -.025em;
+        }
+
+        .panel-title p {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search-wrap {
+            width: min(330px, 100%);
+        }
+
+        .search-wrap input {
+            width: 100%;
+            height: 40px;
+            padding: 0 13px;
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            color: var(--text);
+            background: #171717;
+            outline: none;
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(198,151,95,.12);
+        }
+
+        .sheet-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .sheet-card {
+            min-width: 0;
+            padding: 17px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #202020;
+            transition: border-color .16s ease, transform .16s ease, background .16s ease;
+        }
+
+        .sheet-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--line-warm);
+            background: #24211e;
+        }
+
+        .sheet-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .sheet-name {
+            min-width: 0;
+            margin: 0;
+            overflow: hidden;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 850;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .age-badge {
+            flex: 0 0 auto;
+            padding: 4px 7px;
+            border: 1px solid rgba(84,184,120,.28);
+            border-radius: 999px;
+            color: #82d09d;
+            background: rgba(84,184,120,.08);
+            font-size: 10px;
+            font-weight: 850;
+        }
+
+        .sheet-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .detail {
+            padding: 9px;
+            border-radius: 9px;
+            color: var(--muted);
+            background: #181818;
+            font-size: 11px;
+        }
+
+        .detail b {
+            display: block;
+            margin-top: 3px;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .created-at {
+            padding-top: 12px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .open-link {
+            width: 100%;
+            margin-top: 13px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 55px 20px;
+            border: 1px dashed #555;
+            border-radius: 14px;
+            color: var(--muted);
+            text-align: center;
+            background: #1d1d1d;
+        }
+
+        .empty-state strong {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--text);
+            font-size: 18px;
+        }
+
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background: rgba(0, 0, 0, .68);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .18s ease, visibility .18s ease;
+        }
+
+        .modal-backdrop.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sheet-modal {
+            width: min(620px, 100%);
+            max-height: min(760px, calc(100vh - 48px));
+            overflow: auto;
+            border: 1px solid #4a4036;
+            border-radius: 18px;
+            color: var(--text);
+            background: linear-gradient(180deg, #292929 0%, #202020 100%);
+            box-shadow: 0 30px 100px rgba(0, 0, 0, .55);
+            transform: translateY(14px) scale(.985);
+            transition: transform .18s ease;
+        }
+
+        .modal-backdrop.open .sheet-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(39, 39, 39, .96);
+            backdrop-filter: blur(12px);
+        }
+
+        .modal-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .modal-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #a77a4c;
+            border-radius: 11px;
+            color: #1f160d;
+            background: linear-gradient(145deg, #f0d09e, #b47b42);
+            font-size: 21px;
+            font-weight: 900;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 19px;
+            letter-spacing: -.02em;
+        }
+
+        .modal-header p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            color: var(--muted);
+            background: #1c1c1c;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+            border-color: #65513d;
+            background: #29231e;
+        }
+
+        .sheet-form {
+            padding: 22px;
+        }
+
+        .form-section {
+            padding: 17px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #1b1b1b;
+        }
+
+        .form-section + .form-section {
+            margin-top: 13px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .field {
+            min-width: 0;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #d5c9ba;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .field input {
+            width: 100%;
+            height: 44px;
+            padding: 0 12px;
+            border: 1px solid #444;
+            border-radius: 9px;
+            color: var(--text);
+            background: #131313;
+            outline: none;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .field input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(198, 151, 95, .13);
+        }
+
+        .field-help {
+            margin-top: 6px;
+            color: #878179;
+            font-size: 10px;
+            line-height: 1.45;
+        }
+
+        .size-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 13px;
+        }
+
+        .preset-button {
+            min-height: 31px;
+            padding: 0 10px;
+            border: 1px solid #48413a;
+            border-radius: 8px;
+            color: #c8b9a7;
+            background: #25211e;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 750;
+        }
+
+        .preset-button:hover,
+        .preset-button.active {
+            color: #1d150d;
+            border-color: #e0b67d;
+            background: linear-gradient(180deg, #e5bd87, #bd864f);
+        }
+
+        .advanced-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0;
+            border: 0;
+            color: #d9ccbd;
+            background: transparent;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .advanced-toggle span:last-child {
+            color: var(--muted);
+            transition: transform .18s ease;
+        }
+
+        .advanced-toggle[aria-expanded="true"] span:last-child {
+            transform: rotate(180deg);
+        }
+
+        .advanced-fields {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .advanced-fields.open {
+            display: grid;
+        }
+
+        .modal-footer {
+            position: sticky;
+            bottom: 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 18px 22px;
+            border-top: 1px solid var(--line);
+            background: rgba(35, 35, 35, .97);
+            backdrop-filter: blur(12px);
+        }
+
+        .body-modal-open {
+            overflow: hidden;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 1050px) {
+            .hero { grid-template-columns: 1fr; }
+            .sheet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 700px) {
+            .page { width: min(100% - 22px, 1320px); padding-top: 22px; }
+            .topbar { padding: 0 14px; }
+            .topbar-meta { display: none; }
+            .hero-card { padding: 26px; }
+            .panel-head { align-items: stretch; flex-direction: column; }
+            .search-wrap { width: 100%; }
+            .sheet-grid { grid-template-columns: 1fr; }
+            .modal-backdrop { padding: 10px; }
+            .sheet-modal { max-height: calc(100vh - 20px); }
+            .field-grid { grid-template-columns: 1fr; }
+            .field.full { grid-column: auto; }
+            .modal-footer .btn { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <header class="topbar">
+        <a href="{% url 'home' %}" class="brand">
+            <span class="brand-mark">NR</span>
+            <span>Niron Print Workspace</span>
+        </a>
+        <div class="topbar-meta">Smart artwork preparation for print production</div>
+    </header>
+
+    <main class="page">
+        <section class="hero">
+            <div class="hero-card">
+                <span class="eyebrow">Professional print workspace</span>
+                <h1>Prepare artwork faster. Waste less film.</h1>
+                <p class="hero-copy">
+                    Create print sheets, clean backgrounds, upscale artwork, duplicate quantities,
+                    auto-pack layers and export production-ready files from one workspace.
+                </p>
+                <div class="hero-actions">
+                    <button type="button" class="btn btn-primary" data-open-sheet-modal>＋ Create New Sheet</button>
+                    {% if recent_sheets %}
+                        <a href="{% url 'builder' recent_sheets.0.id %}" class="btn btn-secondary">Open Latest Sheet</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <aside class="activity-card">
+                <div class="metric">
+                    <span>Sheets created in the last {{ recent_days }} days</span>
+                    <strong class="green">{{ recent_sheet_count }}</strong>
+                </div>
+                <div class="metric">
+                    <span>History currently displayed</span>
+                    <strong>{{ recent_days }} days</strong>
+                </div>
+                <div class="metric">
+                    <span>Workspace status</span>
+                    <strong class="green">Ready</strong>
+                </div>
+            </aside>
+        </section>
+
+        <section class="sheets-panel">
+            <div class="panel-head">
+                <div class="panel-title">
+                    <h2>Recent Sheets</h2>
+                    <p>Only sheets created during the latest {{ recent_days }} days are shown.</p>
+                </div>
+                <div class="search-wrap">
+                    <input id="sheetSearch" type="search" placeholder="Search recent sheets…" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="sheet-grid" id="sheetGrid">
+                {% for sheet in recent_sheets %}
+                    <article class="sheet-card" data-sheet-name="{{ sheet.name|lower|escape }}">
+                        <div class="sheet-card-top">
+                            <h3 class="sheet-name" title="{{ sheet.name }}">{{ sheet.name }}</h3>
+                            <span class="age-badge">{{ sheet.created_at|timesince }} ago</span>
+                        </div>
+
+                        <div class="sheet-details">
+                            <div class="detail">
+                                Sheet size
+                                <b>{{ sheet.width_cm }} × {{ sheet.height_cm }} cm</b>
+                            </div>
+                            <div class="detail">
+                                Real layers
+                                <b>{{ sheet.item_count }}</b>
+                            </div>
+                        </div>
+
+                        <div class="created-at">
+                            Created {{ sheet.created_at|date:"d M Y" }} at {{ sheet.created_at|date:"g:i A" }}
+                        </div>
+
+                        <a href="{% url 'builder' sheet.id %}" class="btn btn-secondary open-link">Open Builder →</a>
+                    </article>
+                {% empty %}
+                    <div class="empty-state">
+                        <strong>No sheets created in the last {{ recent_days }} days</strong>
+                        Create a new print sheet to start your next production job.
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="empty-state hidden" id="noSearchResult">
+                <strong>No matching recent sheet</strong>
+                Try another sheet name.
+            </div>
+        </section>
+    </main>
+</div>
+
+<div class="modal-backdrop" id="newSheetModal" aria-hidden="true">
+    <section class="sheet-modal" role="dialog" aria-modal="true" aria-labelledby="newSheetTitle">
+        <header class="modal-header">
+            <div class="modal-title-wrap">
+                <div class="modal-icon">＋</div>
+                <div>
+                    <h2 id="newSheetTitle">Create New Sheet</h2>
+                    <p>Start with the standard 58 × 100 cm print sheet.</p>
+                </div>
+            </div>
+            <button type="button" class="modal-close" data-close-sheet-modal aria-label="Close">×</button>
+        </header>
+
+        <form method="post" action="{% url 'create_sheet' %}" class="sheet-form" id="newSheetForm">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <div class="field-grid">
+                    <div class="field full">
+                        <label for="sheetName">Sheet name</label>
+                        <input
+                            id="sheetName"
+                            type="text"
+                            name="name"
+                            placeholder="Example: Polo Order - June 14"
+                            maxlength="200"
+                            required
+                        >
+                        <div class="field-help">Use the customer name, order name, or production date.</div>
+                    </div>
+
+                    <div class="field">
+                        <label for="sheetWidth">Width (cm)</label>
+                        <input id="sheetWidth" type="number" name="width_cm" value="58" min="1" step="0.01" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="sheetHeight">Height (cm)</label>
+                        <input id="sheetHeight" type="number" name="height_cm" value="100" min="1" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="size-presets" aria-label="Sheet size presets">
+                    <button type="button" class="preset-button active" data-width="58" data-height="100">Standard 58 × 100</button>
+                    <button type="button" class="preset-button" data-width="58" data-height="50">Small 58 × 50</button>
+                    <button type="button" class="preset-button" data-width="58" data-height="200">Long 58 × 200</button>
+                    <button type="button" class="preset-button" data-width="30" data-height="100">Narrow 30 × 100</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <button type="button" class="advanced-toggle" id="advancedToggle" aria-expanded="false">
+                    <span>Advanced spacing settings</span>
+                    <span>⌄</span>
+                </button>
+
+                <div class="field-grid advanced-fields" id="advancedFields">
+                    <div class="field">
+                        <label for="sheetSpacing">Item spacing (cm)</label>
+                        <input id="sheetSpacing" type="number" name="spacing_cm" value="0.20" min="0" step="0.01" required>
+                    </div>
+                    <div class="field">
+                        <label for="sheetMargin">Sheet margin (cm)</label>
+                        <input id="sheetMargin" type="number" name="margin_cm" value="0.20" min="0" step="0.01" required>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <footer class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-close-sheet-modal>Cancel</button>
+            <button type="submit" form="newSheetForm" class="btn btn-primary">Create & Open Builder</button>
+        </footer>
+    </section>
+</div>
+
+<script>
+(function () {
+    const input = document.getElementById('sheetSearch');
+    const cards = Array.from(document.querySelectorAll('.sheet-card'));
+    const noResult = document.getElementById('noSearchResult');
+
+    if (input && cards.length) {
+        input.addEventListener('input', function () {
+            const query = input.value.trim().toLowerCase();
+            let visible = 0;
+
+            cards.forEach(function (card) {
+                const matches = card.dataset.sheetName.includes(query);
+                card.classList.toggle('hidden', !matches);
+                if (matches) visible += 1;
+            });
+
+            noResult.classList.toggle('hidden', visible !== 0);
+        });
+    }
+
+    const modal = document.getElementById('newSheetModal');
+    const nameInput = document.getElementById('sheetName');
+    const widthInput = document.getElementById('sheetWidth');
+    const heightInput = document.getElementById('sheetHeight');
+    const openButtons = document.querySelectorAll('[data-open-sheet-modal]');
+    const closeButtons = document.querySelectorAll('[data-close-sheet-modal]');
+    const presetButtons = document.querySelectorAll('.preset-button');
+    const advancedToggle = document.getElementById('advancedToggle');
+    const advancedFields = document.getElementById('advancedFields');
+
+    function openModal() {
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('body-modal-open');
+        window.setTimeout(function () {
+            nameInput.focus();
+        }, 90);
+    }
+
+    function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('body-modal-open');
+    }
+
+    openButtons.forEach(function (button) {
+        button.addEventListener('click', openModal);
+    });
+
+    closeButtons.forEach(function (button) {
+        button.addEventListener('click', closeModal);
+    });
+
+    modal.addEventListener('mousedown', function (event) {
+        if (event.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.classList.contains('open')) {
+            closeModal();
+        }
+    });
+
+    presetButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            widthInput.value = button.dataset.width;
+            heightInput.value = button.dataset.height;
+            presetButtons.forEach(function (item) {
+                item.classList.toggle('active', item === button);
+            });
+        });
+    });
+
+    function clearPresetHighlight() {
+        presetButtons.forEach(function (button) {
+            const matches =
+                Number(button.dataset.width) === Number(widthInput.value) &&
+                Number(button.dataset.height) === Number(heightInput.value);
+            button.classList.toggle('active', matches);
+        });
+    }
+
+    widthInput.addEventListener('input', clearPresetHighlight);
+    heightInput.addEventListener('input', clearPresetHighlight);
+
+    advancedToggle.addEventListener('click', function () {
+        const expanded = advancedToggle.getAttribute('aria-expanded') === 'true';
+        advancedToggle.setAttribute('aria-expanded', String(!expanded));
+        advancedFields.classList.toggle('open', !expanded);
+    });
+})();
+</script>
+</body>
+</html>

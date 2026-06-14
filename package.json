@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "konva": "^10.2.3",
+    "react-konva": "^19.2.3",
+    "react-rnd": "^10.5.3"
+  }
+}

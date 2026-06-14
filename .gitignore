@@ -1,0 +1,13 @@
+venv/
+node_modules/
+frontend/node_modules/
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+media/
+staticfiles/
+exports/
+tools/
+models/
+*.tar.gz

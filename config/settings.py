@@ -6,7 +6,6 @@ SECRET_KEY = 'django-insecure-niron-dev-key'
 
 DEBUG = True
 
-# ✅ FIX: allow your server IP + local access
 ALLOWED_HOSTS = [
     '5.223.90.183',
     '127.0.0.1',
@@ -65,11 +64,9 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Asia/Phnom_Penh'
 
 USE_I18N = True
-
 USE_TZ = True
 
 STATIC_URL = 'static/'

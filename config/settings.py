@@ -3,8 +3,15 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-niron-dev-key'
+
 DEBUG = True
-ALLOWED_HOSTS = []
+
+# ✅ FIX: allow your server IP + local access
+ALLOWED_HOSTS = [
+    '5.223.90.183',
+    '127.0.0.1',
+    'localhost'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -58,8 +65,11 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
+
 TIME_ZONE = 'Asia/Phnom_Penh'
+
 USE_I18N = True
+
 USE_TZ = True
 
 STATIC_URL = 'static/'
@@ -68,5 +78,6 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
